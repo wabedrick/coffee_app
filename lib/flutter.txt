@@ -1,0 +1,288 @@
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  // This widget is the root of your application.
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Flutter Demo',
+      theme: ThemeData(
+       
+        // tested with just a hot reload.
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        useMaterial3: true,
+      ),
+      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+    );
+  }
+}
+
+class MyHomePage extends StatefulWidget {
+  const MyHomePage({super.key, required this.title});
+
+  // This widget is the home page of your application. It is stateful, meaning
+  // that it has a State object (defined below) that contains fields that affect
+  // how it looks.
+
+  // This class is the configuration for the state. It holds the values (in this
+  // case the title) provided by the parent (in this case the App widget) and
+  // used by the build method of the State. Fields in a Widget subclass are
+  // always marked "final".
+
+  final String title;
+
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  int _counter = 0;
+
+  void _incrementCounter() {
+    setState(() {
+      // This call to setState tells the Flutter framework that something has
+      // changed in this State, which causes it to rerun the build method below
+      // so that the display can reflect the updated values. If we changed
+      // _counter without calling setState(), then the build method would not be
+      // called again, and so nothing would appear to happen.
+      _counter++;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // This method is rerun every time setState is called, for instance as done
+    // by the _incrementCounter method above.
+    //
+    // The Flutter framework has been optimized to make rerunning build methods
+    // fast, so that you can just rebuild anything that needs updating rather
+    // than having to individually change instances of widgets.
+    return Scaffold(
+      appBar: AppBar(
+        // TRY THIS: Try changing the color here to a specific color (to
+        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
+        // change color while the other colors stay the same.
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        // Here we take the value from the MyHomePage object that was created by
+        // the App.build method, and use it to set our appbar title.
+        title: Text(widget.title),
+      ),
+      body: Center(
+        // Center is a layout widget. It takes a single child and positions it
+        // in the middle of the parent.
+        child: Column(
+          // Column is also a layout widget. It takes a list of children and
+          // arranges them vertically. By default, it sizes itself to fit its
+          // children horizontally, and tries to be as tall as its parent.
+          //
+          // Column has various properties to control how it sizes itself and
+          // how it positions its children. Here we use mainAxisAlignment to
+          // center the children vertically; the main axis here is the vertical
+          // axis because Columns are vertical (the cross axis would be
+          // horizontal).
+          //
+          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
+          // action in the IDE, or press "p" in the console), to see the
+          // wireframe for each widget.
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            const Text(
+              'You have pushed the button this many times:',
+            ),
+            Text(
+              '$_counter',
+              style: Theme.of(context).textTheme.headlineMedium,
+            ),
+          ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _incrementCounter,
+        tooltip: 'Increment',
+        child: const Icon(Icons.add),
+      ), // This trailing comma makes auto-formatting nicer for build methods.
+    );
+  }
+}
+
+
+
+Container(
+        color: Colors.amber,
+        child: Text('Hello'),
+        padding: EdgeInsets.all(80.0),
+        margin: EdgeInsets.all(50),
+      ),
+
+      // body: Center(
+
+      //   // child: Image.asset('assets/universe1.jpg'),
+      //   child: ElevatedButton.icon(
+          
+      //     onPressed: (){},
+      //        icon: Icon(
+      //        Icons.email,
+      //        color: Colors.amber,
+      //   ),
+      //   label: Text('Send Mail'),
+      //   color: Colors.blueAccent,
+
+      //   ),
+      //   // 
+
+      //   // child: Text(
+      //   //   'How are you guys',
+      //   //   style: TextStyle(
+      //   //     fontWeight: FontWeight.bold,
+      //   //     fontSize: 20.0,
+      //   //     color: Colors.grey[600],
+      //   //     letterSpacing: 2.0,
+      //   //     fontFamily: 'IndieFlower',
+            
+      //   //   ),
+      //   //   ),
+
+      appBar: AppBar(
+        title: Text('My Coffee App'),
+        centerTitle: true,
+        backgroundColor: Colors.red[600],
+      ),
+
+      body: Row(
+         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+         crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            flex: 4,
+            child: Image.asset('assets/universe2.jpg')
+            ),
+
+           Expanded(
+            flex: 3,
+             child: Container(
+                padding: EdgeInsets.all(30.0),
+                color: Colors.blue,
+                
+           
+              ),
+           ),
+
+             Expanded(
+              flex: 3,
+               child: Container(
+                padding: EdgeInsets.all(30.0),
+                color: Colors.cyan,
+                
+             
+                         ),
+             ),
+          
+
+            Expanded(
+              flex: 2,
+              child: Container(
+                padding: EdgeInsets.all(30.0),
+                color: Colors.amber,
+               
+            
+              ),
+            ),
+        ],
+      ),
+
+      ackgroundColor: Colors.grey[900],
+      appBar: AppBar(
+        title: const Text('Ninja Id Card'),
+        centerTitle: true,
+        backgroundColor: Colors.grey[850],
+        elevation: 0.0,
+        ),
+
+        floatingActionButton: FloatingActionButton(
+          onPressed: (){
+            setState(() {
+              ninjaLevel +=1;
+            });
+          },
+          backgroundColor: Colors.grey[800],
+          child: const Icon(Icons.add),
+          ),
+
+        body: Padding(
+          padding: const EdgeInsets.fromLTRB(30.0, 20.0, 40.0, 20.0),
+
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Center(
+                child: CircleAvatar(
+                  backgroundImage: AssetImage('assets/avator.png'),
+                  radius: 40.0,
+                  ),
+              ),
+
+                Divider(
+                  height: 80.0,
+                  color: Colors.grey[800],
+                  ),
+
+              const Text(
+                'NAME',
+                style: TextStyle(
+                  color: Colors.grey,
+                  letterSpacing: 2.0,
+                ),
+                ),
+                const SizedBox(height: 10.0,),
+                 const Text(
+                'Edrick',
+                style: TextStyle(
+                  color: Colors.amberAccent,
+                  letterSpacing: 2.0,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 28.0,
+                ),
+                ),
+                const SizedBox(height: 30.0,),
+                const Text(
+                  'CURRENT NINJA LEVEL',
+                  style: TextStyle(
+                    letterSpacing: 2.0,
+                    color: Colors.grey,
+                  ),
+                  ),
+                  const SizedBox(height: 10.0,),
+
+                  Text(
+                    '$ninjaLevel',
+                    style: const TextStyle(
+                      letterSpacing: 2.0,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.amberAccent,
+                      fontSize: 28.0,
+                    ),
+                  ),
+                   const SizedBox(height: 30.0,),
+
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.email,
+                        color: Colors.grey[400],
+                      ),
+                      const SizedBox(width: 10.0,),
+                      const Text(
+                        'edrickpowerfull@gmail.com',
+                        style: TextStyle(
+                          color: Colors.grey,
+                          letterSpacing: 1.0,
+                          fontSize: 18.0,
+                        ),
+                        ),
+                    ],
+                  ),
+                const SizedBox(height: 30.0,),
+                
+            ],
+          ),
+          ),
