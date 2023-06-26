@@ -1,11 +1,10 @@
-// import 'package:coffee_app/dashboard.dart';
-import 'package:coffee_app/capture_batch.dart';
+import 'package:coffee_app/dashboard.dart';
 import 'package:flutter/material.dart';
 
 
 void main() {
   runApp( const MaterialApp(
-    home: CaptureBatch(),
+    home: Dashboard(),
   ));
 }
 

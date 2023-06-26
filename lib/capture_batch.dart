@@ -1,49 +1,30 @@
-// import 'dart:io';
+
 // ignore_for_file: library_private_types_in_public_api
 
-import 'package:flutter/material.dart';
-import 'package:camera/camera.dart';
+import 'dart:io';
 
-class CaptureBatch extends StatefulWidget {
-  const CaptureBatch({super.key});
+import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+
+class RegistrationScreen extends StatefulWidget {
+  const RegistrationScreen({super.key});
 
   @override
-  _CaptureBatchState createState() => _CaptureBatchState();
+  _RegistrationScreenState createState() => _RegistrationScreenState();
 }
 
-class _CaptureBatchState extends State<CaptureBatch> {
-  late CameraController _controller;
-  late Future<void> _initializeControllerFuture;
-  final _formKey = GlobalKey<FormState>();
-  final TextEditingController _nameController = TextEditingController();
-  String _selectedCoffeeType = '';
+class _RegistrationScreenState extends State<RegistrationScreen> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  String? selectedCoffee;
+  File? _image;
 
-  @override
-  void initState() {
-    super.initState();
-    _initializeCamera();
-  }
-
-  Future<void> _initializeCamera() async {
-    final cameras = await availableCameras();
-    final firstCamera = cameras.first;
-
-    _controller = CameraController(firstCamera, ResolutionPreset.medium);
-    _initializeControllerFuture = _controller.initialize();
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  void _saveForm() {
-    if (_formKey.currentState!.validate()) {
-      // Save form data
-      String name = _nameController.text;
-      // Do something with the captured photo
-      // ...
+  void _pickImage() async {
+    final picker = ImagePicker();
+    final pickedImage = await picker.pickImage(source: ImageSource.camera);
+    if (pickedImage != null) {
+      setState(() {
+        _image = File(pickedImage.path);
+      });
     }
   }
 
@@ -53,97 +34,80 @@ class _CaptureBatchState extends State<CaptureBatch> {
       appBar: AppBar(
         title: const Text('Registration'),
       ),
-      body: Column(
-        children: [
-          const SizedBox(height: 20),
-          Form(
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Form(
             key: _formKey,
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: TextFormField(
-                    controller: _nameController,
-                    decoration: const InputDecoration(
-                      labelText: 'Name',
-                      border: OutlineInputBorder(),
+                const Text(
+                  'Coffee Type',
+                  style: TextStyle(fontSize: 16.0),
+                ),
+                DropdownButtonFormField<String>(
+                  value: selectedCoffee,
+                  items: [
+                    'Espresso',
+                    'Cappuccino',
+                    'Latte',
+                    'Mocha',
+                    'Americano',
+                  ].map((String coffeeType) {
+                    return DropdownMenuItem<String>(
+                      value: coffeeType,
+                      child: Text(coffeeType),
+                    );
+                  }).toList(),
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      selectedCoffee = newValue;
+                    });
+                  },
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please select a coffee type';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16.0),
+                const Text(
+                  'Take a Photo of the Coffee',
+                  style: TextStyle(fontSize: 16.0),
+                ),
+
+                const SizedBox(height: 8.0),
+                GestureDetector(
+                  onTap: _pickImage,
+                  child: Container(
+                    width: 150.0,
+                    height: 150.0,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[200],
+                      borderRadius: BorderRadius.circular(8.0),
                     ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your name';
-                      }
-                      return null;
-                    },
+                    child: _image == null
+                        ? Icon(Icons.camera_alt, size: 64.0, color: Colors.grey[400])
+                        : Image.file(_image!, fit: BoxFit.cover),
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: DropdownButtonFormField<String>(
-                    value: _selectedCoffeeType,
-                    onChanged: (value) {
-                      setState(() {
-                        _selectedCoffeeType = value!;
-                      });
-                    },
-                    decoration: const InputDecoration(
-                      labelText: 'Coffee Type',
-                      border: OutlineInputBorder(),
-                    ),
-                    items: const [
-                      DropdownMenuItem(
-                        value: 'Espresso',
-                        child: Text('Espresso'),
-                      ),
-                      DropdownMenuItem(
-                        value: 'Cappuccino',
-                        child: Text('Cappuccino'),
-                      ),
-                      DropdownMenuItem(
-                        value: 'Latte',
-                        child: Text('Latte'),
-                      ),
-                    ],
-                  ),
+                const SizedBox(height: 16.0),
+                ElevatedButton(
+                  onPressed: () {
+                    if (_formKey.currentState!.validate()) {
+                      // Form is valid, perform registration or data processing here
+                      // Access selectedCoffee and _image variables for further use
+                    }
+                  },
+                  child: const Text('Register'),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 20),
-          Expanded(
-            child: FutureBuilder<void>(
-              future: _initializeControllerFuture,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.done) {
-                  return CameraPreview(_controller);
-                } else {
-                  return const Center(child: CircularProgressIndicator());
-                }
-              },
-            ),
-          ),
-          ElevatedButton(
-            onPressed: _saveForm,
-            child: const Text('Register'),
-          ),
-        ],
+        ),
       ),
     );
   }
 }
-
-// void main() {
-//   runApp(MyApp());
-// }
-
-// class MyApp extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     return MaterialApp(
-//       title: 'Registration App',
-//       theme: ThemeData(
-//         primarySwatch: Colors.blue,
-//       ),
-//       home: RegistrationScreen(),
-//     );
-//   }
-// }
