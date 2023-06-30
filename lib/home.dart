@@ -1,3 +1,4 @@
+import 'package:coffee_app/dashboard.dart';
 import 'package:coffee_app/register.dart';
 import 'package:flutter/material.dart';
 
@@ -17,7 +18,7 @@ class HomePage extends StatefulWidget {
       if (_email == correctEmail && _password == correctPassword) {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const SuccessPage()),
+          MaterialPageRoute(builder: (context) => const Dashboard()),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -167,18 +168,18 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-class SuccessPage extends StatelessWidget {
-  const SuccessPage({super.key});
+// class SuccessPage extends StatelessWidget {
+//   const SuccessPage({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(
-        child: Text('Success Page'),
-      ),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return const Scaffold(
+//       body: Center(
+//         child: Text('Success Page'),
+//       ),
+//     );
+//   }
+// }
 
 
 
