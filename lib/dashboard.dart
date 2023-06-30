@@ -1,7 +1,59 @@
+// import 'package:coffee_app/about_coffee.dart';
+// import 'package:coffee_app/batch_results.dart';
+// import 'package:coffee_app/capture_batch.dart';
+// import 'package:coffee_app/scan_qrcode.dart';
+// import 'package:flutter/material.dart';
+// import 'package:logger/logger.dart';
+
+// class Dashboard extends StatefulWidget {
+//   const Dashboard({Key? key}) : super(key: key);
+
+//   @override
+//   State<Dashboard> createState() => _DashboardState();
+// }
+
+// class _DashboardState extends State<Dashboard> {
+//   final logger = Logger();
+//   String qrCode = '';
+//   String userName = 'Edrick';
+//   String avatarImage = 'assets/avatar.png';
+
+//   void logout() {
+//     // Perform logout logic here
+//     logger.d('User logged out');
+//     // Navigate to login page
+//     Navigator.of(context).pushReplacementNamed('/login');
+//   }
+
+//   String getBatchImage(double radius) {
+//     if (radius < 120) {
+//       return 'assets/coffeeBag.jpg';
+//     } else {
+//       return 'assets/coffeeBag_large.jpg';
+//     }
+//   }
+
+//   String getQRImage(double radius) {
+//     if (radius < 120) {
+//       return 'assets/qrImage.jpeg';
+//     } else {
+//       return 'assets/qrImage_large.jpeg';
+//     }
+//   }
+
+//   String getResultsImage(double radius) {
+//     if (radius < 120) {
+//       return 'assets/results.jpg';
+//     } else {
+//       return 'assets/results_large.jpg';
+//     }
+//   }
+
 import 'package:coffee_app/capture_batch.dart';
 import 'package:coffee_app/scan_qrcode.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
+// import 'package:coffee_app/about_coffee.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({Key? key}) : super(key: key);
@@ -11,8 +63,41 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends State<Dashboard> {
-  var logger = Logger();
+  final logger = Logger();
   String qrCode = '';
+  String userName = 'Edrick';
+  String avatarImage = 'assets/avatar.png';
+
+  void logout() {
+    // Perform logout logic here
+    logger.d('User logged out');
+    // Navigate to login page
+    Navigator.of(context).pushReplacementNamed('/login');
+  }
+
+  String getBatchImage(double radius) {
+    if (radius < 120) {
+      return 'assets/coffeeBag.jpg';
+    } else {
+      return 'assets/coffeeBag_large.jpg';
+    }
+  }
+
+  String getQRImage(double radius) {
+    if (radius < 120) {
+      return 'assets/qrImage.jpeg';
+    } else {
+      return 'assets/qrImage_large.jpeg';
+    }
+  }
+
+  String getResultsImage(double radius) {
+    if (radius < 120) {
+      return 'assets/results.jpg';
+    } else {
+      return 'assets/results_large.jpg';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,19 +105,41 @@ class _DashboardState extends State<Dashboard> {
       home: Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.brown[400],
+          actions: [
+            GestureDetector(
+              onTap: logout,
+              child: Container(
+                margin: const EdgeInsets.all(8.0),
+                child: Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 16,
+                      backgroundImage: AssetImage(avatarImage),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      userName,
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                    const Icon(Icons.logout),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
         body: Container(
           color: Colors.brown[200],
           child: Column(
             children: [
-              const SizedBox(height: 10.0),
+              // const SizedBox(height: 10.0),
               Container(
                 color: Colors.brown[200],
                 child: Image.asset(
                   'assets/appstore2.png',
                   height: 150,
                   width: 150,
-                  fit: BoxFit.fitWidth,
+                  // fit: BoxFit.fitWidth,
                 ),
               ),
               const SizedBox(height: 10.0),
@@ -84,13 +191,13 @@ class _DashboardState extends State<Dashboard> {
                               child: Column(
                                 children: [
                                   SizedBox(
-                                    width: 170,
-                                    height: 150,
+                                    width: 120,
+                                    height: 120,
                                     child: Image.asset(
-                                      'assets/coffeeBag.jpg',
-                                      height: 150,
-                                      width: 150,
-                                      fit: BoxFit.fitWidth,
+                                      getBatchImage(100), // Update radius value
+                                      height: 80,
+                                      width: 100,
+                                      // fit: BoxFit.fitWidth,
                                     ),
                                   ),
                                   const Center(
@@ -103,7 +210,7 @@ class _DashboardState extends State<Dashboard> {
                               ),
                             ),
                           ),
-                          const SizedBox(width: 10.0),
+                          const SizedBox(width: 60.0),
                           Container(
                             decoration: BoxDecoration(
                               color: Colors.brown[100],
@@ -127,13 +234,13 @@ class _DashboardState extends State<Dashboard> {
                               child: Column(
                                 children: [
                                   SizedBox(
-                                    width: 170,
-                                    height: 150,
+                                    width: 120,
+                                    height: 120,
                                     child: Image.asset(
-                                      'assets/qrImage.jpeg',
-                                      height: 150,
-                                      width: 150,
-                                      fit: BoxFit.fitWidth,
+                                      getQRImage(100), // Update radius value
+                                      height: 80,
+                                      width: 100,
+                                      // fit: BoxFit.fitWidth,
                                     ),
                                   ),
                                   const Center(
@@ -148,7 +255,7 @@ class _DashboardState extends State<Dashboard> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 20.0),
+                      const SizedBox(height: 60.0),
                       Row(
                         children: [
                           Container(
@@ -174,13 +281,13 @@ class _DashboardState extends State<Dashboard> {
                               child: Column(
                                 children: [
                                   SizedBox(
-                                    width: 170,
-                                    height: 150,
+                                    width: 140,
+                                    height: 120,
                                     child: Image.asset(
-                                      'assets/results.jpg',
+                                      getResultsImage(100), // Update radius value
                                       height: 80,
-                                      width: 80,
-                                      fit: BoxFit.fitHeight,
+                                      width: 100,
+                                      // fit: BoxFit.fitWidth,
                                     ),
                                   ),
                                   const Center(
@@ -193,7 +300,9 @@ class _DashboardState extends State<Dashboard> {
                               ),
                             ),
                           ),
-                          const SizedBox(width: 10.0),
+
+                          const SizedBox(width: 60.0),
+
                           Container(
                             decoration: BoxDecoration(
                               color: Colors.brown[100],
@@ -208,24 +317,29 @@ class _DashboardState extends State<Dashboard> {
                             ),
                             child: GestureDetector(
                               onTap: () {
-                                // Handle card 4 click action
-                                logger.d('My Account Info!');
+                                // Navigator.of(context).push(
+                                //   MaterialPageRoute(
+                                //     builder: (context) => const BatchResult(qrCode: '',),
+                                //   ),
+                                // );
+                                Navigator.pushReplacementNamed(context, '/batchResult');
                               },
+
                               child: Column(
                                 children: [
                                   SizedBox(
-                                    width: 170,
-                                    height: 150,
+                                    width: 140,
+                                    height: 120,
                                     child: Image.asset(
-                                      'assets/avatar.png',
-                                      height: 100,
-                                      width: 100,
+                                      'assets/coffee.jpeg',
+                                      height: 80,
+                                      width: 80,
                                       fit: BoxFit.fitWidth,
                                     ),
                                   ),
                                   const Center(
                                     child: Text(
-                                      'My Account',
+                                      'About Coffee',
                                       style: TextStyle(fontSize: 20.0),
                                     ),
                                   ),
@@ -249,14 +363,13 @@ class _DashboardState extends State<Dashboard> {
                   child: const Text(
                     'Link to the webapp',
                     style: TextStyle(
-                      fontSize: 20.0,
-                      color: Colors.black,
+                      color: Colors.blue,
+                      fontSize: 16.0,
                       decoration: TextDecoration.underline,
-                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
-              )
+              ),
             ],
           ),
         ),
