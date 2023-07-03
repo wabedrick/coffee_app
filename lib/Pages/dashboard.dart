@@ -49,8 +49,8 @@
 //     }
 //   }
 
-import 'package:coffee_app/capture_batch.dart';
-import 'package:coffee_app/scan_qrcode.dart';
+import 'package:coffee_app/Pages/capture_batch.dart';
+import 'package:coffee_app/Pages/scan_qrcode.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 // import 'package:coffee_app/about_coffee.dart';

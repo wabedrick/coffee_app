@@ -1,5 +1,5 @@
-import 'package:coffee_app/dashboard.dart';
-import 'package:coffee_app/register.dart';
+import 'package:coffee_app/Pages/dashboard.dart';
+import 'package:coffee_app/Pages/register.dart';
 import 'package:flutter/material.dart';
 
 // ignore: must_be_immutable
