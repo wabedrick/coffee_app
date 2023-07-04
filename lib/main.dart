@@ -1,7 +1,7 @@
 import 'package:coffee_app/Pages/batch_results.dart';
 import 'package:coffee_app/Pages/capture_batch.dart';
 import 'package:coffee_app/Pages/dashboard.dart';
-import 'package:coffee_app/Pages/logging_in.dart';
+import 'package:coffee_app/Pages/home.dart';
 import 'package:coffee_app/Pages/scan_qrcode.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
