@@ -105,7 +105,8 @@ class _HomePageState extends State<HomePage> {
                         },
                       ),
                       TextFormField(
-                        decoration: const InputDecoration(labelText: 'Password'),
+                        decoration:
+                            const InputDecoration(labelText: 'Password'),
                         obscureText: true,
                         validator: (value) {
                           if (value!.isEmpty) {
@@ -120,21 +121,20 @@ class _HomePageState extends State<HomePage> {
                       const SizedBox(height: 16.0),
                       ElevatedButton(
                         onPressed: () => widget._submitForm(context),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.brown[600],
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(32.0),
-                            ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.brown[600],
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(32.0),
                           ),
+                        ),
                         child: const Text(
                           'Login',
                           style: TextStyle(
                             fontSize: 16.0,
                             fontWeight: FontWeight.bold,
                           ),
-
-                          ),
+                        ),
                       ),
                     ],
                   ),
@@ -147,7 +147,7 @@ class _HomePageState extends State<HomePage> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => Register(),
+                    builder: (context) => const Register(),
                   ),
                 );
               },

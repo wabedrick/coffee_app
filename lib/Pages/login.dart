@@ -1,39 +1,53 @@
+import 'package:coffee_app/Constants/api.dart';
+import 'package:coffee_app/Pages/Models/users.dart';
+import 'package:coffee_app/Pages/dashboard.dart';
+import 'package:coffee_app/Pages/register.dart';
+import 'package:coffee_app/main.dart';
 import 'package:flutter/material.dart';
-// import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+// ignore: must_be_immutable
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+  const LoginScreen({Key? key}) : super(key: key);
 
   @override
-  // ignore: library_private_types_in_public_api
-  _LoginScreenState createState() => _LoginScreenState();
+  State<LoginScreen> createState() => _LoginScreenState();
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final TextEditingController _usernameController = TextEditingController();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  bool signingIn = false;
+
+  final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  final bool _isLoading = false;
-  String _errorMessage = '';
-
-  Future<void> _login(BuildContext context) async {
-    final String username = _usernameController.text;
-    final String password = _passwordController.text;
-
-    // Perform your authentication logic here
-    // Example: Check if username and password are correct
-    // You can replace this with your own authentication logic
-
-    if (username == 'your_username' && password == 'your_password') {
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.setBool('isLoggedIn', true);
-      
-      // ignore: use_build_context_synchronously
-      Navigator.pushReplacementNamed(context, '/dashboard');
-    } else {
+  void _submitForm(BuildContext context) {
+    if (_formKey.currentState!.validate()) {
       setState(() {
-        _errorMessage = 'Invalid credentials';
+        signingIn = true;
+      });
+      loginUser(
+              email: _emailController.text, password: _passwordController.text)
+          .then((res) async {
+        setState(() {
+          signingIn = false;
+        });
+        if (res["message"] != "failed") {
+          User user = User.fromJson(res["data"]);
+          context.read<AuthService>().setUser(user);
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          await prefs.setString('userEmail', user.email);
+
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const Dashboard()),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Invalid email or password')),
+          );
+        }
       });
     }
   }
@@ -41,41 +55,351 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // resizeToAvoidBottomInset: false,
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Login'),
+        title: const Text('CQTS App'),
+        centerTitle: true,
+        backgroundColor: Colors.brown[900],
+        elevation: 0.0,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            TextField(
-              controller: _usernameController,
-              decoration: const InputDecoration(labelText: 'Username'),
-            ),
-            TextField(
-              controller: _passwordController,
-              decoration: const InputDecoration(labelText: 'Password'),
-              obscureText: true,
-            ),
-            const SizedBox(height: 16.0),
-            ElevatedButton(
-              onPressed: _isLoading ? null : () => _login(context),
-              child: _isLoading ? const CircularProgressIndicator() : const Text('Login'),
-            ),
-            if (_errorMessage.isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8.0),
-                child: Text(
-                  _errorMessage,
-                  style: const TextStyle(
-                    color: Colors.red,
+      body: Center(
+        child: SingleChildScrollView(
+          child: Container(
+            padding: const EdgeInsets.all(16.0),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  const SizedBox(height: 30.0),
+                  const Text(
+                    'LOGIN',
+                    style: TextStyle(
+                      color: Colors.black,
+                      letterSpacing: 2.0,
+                      fontSize: 28.0,
+                      fontWeight: FontWeight.bold,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
-                ),
+                  const SizedBox(height: 30.0),
+                  TextFormField(
+                    decoration: const InputDecoration(labelText: 'Email'),
+                    controller: _emailController,
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'Please enter your email';
+                      }
+                      return null;
+                    },
+                  ),
+                  TextFormField(
+                    decoration: const InputDecoration(labelText: 'Password'),
+                    controller: _passwordController,
+                    obscureText: true,
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'Please enter your password';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 16.0),
+                  (!signingIn)
+                      ? SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: () => _submitForm(context),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.brown[600],
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(32.0),
+                              ),
+                            ),
+                            child: const Text(
+                              'Login',
+                              style: TextStyle(
+                                fontSize: 16.0,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        )
+                      : Container(
+                          width: 25,
+                          height: 25,
+                          margin: const EdgeInsets.symmetric(vertical: 10),
+                          alignment: Alignment.center,
+                          child: CircularProgressIndicator(
+                            color: Colors.brown[600],
+                          ),
+                        ),
+                  const SizedBox(height: 10.0),
+                  GestureDetector(
+                    onTap: () {
+                      // Navigate to the registration page
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const Register(),
+                        ),
+                      );
+                    },
+                    child: const Text(
+                      'Register as Buyer.',
+                      style: TextStyle(
+                        fontSize: 16.0,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.brown,
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-          ],
+            ),
+          ),
         ),
       ),
     );
   }
 }
+
+// class SuccessPage extends StatelessWidget {
+//   const SuccessPage({super.key});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return const Scaffold(
+//       body: Center(
+//         child: Text('Success Page'),
+//       ),
+//     );
+//   }
+// }
+
+
+
+
+// import 'package:coffee_app/register.dart';
+// import 'package:flutter/material.dart';
+
+
+// class LoginScreen extends StatefulWidget {
+//    LoginScreen({super.key,});
+
+//   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+//   final String correctEmail = 'user@example.com';
+//   final String correctPassword = 'password';
+
+//   final String _email = '';
+//   final String _password = '';
+
+//   void _submitForm(BuildContext context) {
+//     if (_formKey.currentState!.validate()) {
+//       if (_email == correctEmail && _password == correctPassword) {
+//         Navigator.push(
+//           context,
+//           MaterialPageRoute(builder: (context) => SuccessPage()),
+//         );
+//       } else {
+//         ScaffoldMessenger.of(context).showSnackBar(
+//           const SnackBar(content: Text('Invalid email or password')),
+//         );
+//       }
+//     }
+//   }
+   
+//      @override
+//      State<LoginScreen> createState() => _LoginScreenState();
+  
+//   }
+
+// class _LoginScreenState extends State<LoginScreen> {
+//   @override
+//   Widget build(BuildContext context) {
+//     return  Scaffold(
+
+//       resizeToAvoidBottomInset : false,
+//       backgroundColor: Colors.white,
+
+//       appBar: AppBar(
+//         title: const Text('The Coffee App'),
+//         centerTitle: true,
+//         backgroundColor: Colors.brown[900],
+//         elevation: 0.0,
+//       ),
+
+//       body: Container(
+//         padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0), 
+//         child: Column(
+//           crossAxisAlignment: CrossAxisAlignment.start,
+//           children: [
+//             const Row(
+//               children: [
+//                 Text(
+//                 'COFFEE QUALITY',
+                
+//                 style: TextStyle(
+//                   color: Colors.black,
+//                   letterSpacing: 2.0,
+//                   fontSize: 28.0,
+//                   fontWeight: FontWeight.bold,
+//                   overflow: TextOverflow.ellipsis,
+//                 ),
+//               ),
+      
+//           ]),
+      
+//             // Divider(
+//             //   height: 80.0,
+//             //   color: Colors.grey[800],
+//             // ),
+//            //Insert Image here
+      
+//            const SizedBox(height: 30.0),
+      
+//             const Row(
+//               children: [
+//                 Expanded(
+//                   flex: 1,
+//                   child: Image(
+//                     image: AssetImage('assets/roasted_coffee_beans.jpg'),
+//                     height: 200.0,
+//                     fit: BoxFit.fill,
+                     
+//                   ),
+//                 ),
+//               ],
+//             ),
+      
+//              const SizedBox(height: 30.0),
+      
+//               const Row(
+//               children: [
+//                 Text(
+//                 'Login Your Account',
+                
+//                 style: TextStyle(
+//                   color: Colors.black,
+//                   letterSpacing: 2.0,
+//                   fontSize: 28.0,
+//                   fontWeight: FontWeight.bold,
+//                   overflow: TextOverflow.ellipsis,
+//                 ),
+//               ),
+      
+//           ]),
+      
+      
+//           const SizedBox(height: 30.0),
+         
+//          Expanded(
+
+//          child: Padding(
+
+//            padding: const EdgeInsets.all(8.0),
+//            child: Form(
+//             key: _formKey,
+            
+//             child: Column(
+//               crossAxisAlignment: CrossAxisAlignment.stretch,
+//               children: <Widget>[
+//                 TextFormField(
+//                   decoration: const InputDecoration(labelText: 'Email'),
+//                   validator: (value) {
+//                     if (value!.isEmpty) {
+//                       return 'Please enter your email';
+//                     }
+//                     return null;
+//                   },
+//                   onSaved: (value) {
+//                     _email = value!;
+//                   },
+//                 ),
+//                 TextFormField(
+//                   decoration: InputDecoration(labelText: 'Password'),
+//                   obscureText: true,
+//                   validator: (value) {
+//                     if (value!.isEmpty) {
+//                       return 'Please enter your password';
+//                     }
+//                     return null;
+//                   },
+//                   onSaved: (value) {
+//                     _password = value!;
+//                   },
+//                 ),
+//                 SizedBox(height: 16.0),
+//                 ElevatedButton(
+//                   onPressed: () => _submitForm(context),
+//                   child: Text('Submit'),
+//                 ),
+//               ],
+//             ),
+         
+//                  GestureDetector(
+//                   onTap: () {
+//                     // Navigate to the registration page
+//                     Navigator.push(
+//                       context,
+//                       MaterialPageRoute(
+//                         builder: (context) => Register(),
+//                       ),
+//                     );
+//                   },
+                  
+//                   child: const Text(
+//                     'Register here',
+//                     style: TextStyle(
+//                       fontSize: 16.0,
+//                       fontWeight: FontWeight.bold,
+//                       color: Colors.brown,
+//                       decoration: TextDecoration.underline,
+//                     ),
+//                   ),
+//                 ),
+         
+              
+           
+            
+               
+         
+//                ),
+//          ),
+//     );
+//   }
+// }
+
+// class Form extends StatelessWidget {
+//   const Form({
+//     super.key,
+//   });
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return const TextField(
+//      // focusNode: _focusNode,
+//      // controller: _emailController,
+//       decoration: InputDecoration(
+//         border: OutlineInputBorder(),
+
+//         focusedBorder: OutlineInputBorder(
+//            borderSide: BorderSide(color: Colors.brown), // Change focused border color
+//          ),
+
+//         labelText: 'Email',
+
+//          labelStyle: TextStyle(color: Colors.brown),
+
+//       ),
+
+//      //  validator: (value) {
+//      //           if (value == null || value.isEmpty) {
+//      //             return 'Please enter your firstname.';
+//      //           }
+//      //           return null;
+//     );
+//   }
+// }

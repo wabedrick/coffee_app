@@ -1,22 +1,29 @@
 class User {
-  late final String userid;
-  late final String useremail;
-  late final String userpassword;
+  final int id;
+  final String email;
+  final String name;
+  final String group;
 
-
-  User({required this.userid, required this.useremail, required this.userpassword});
+  User({
+    required this.id,
+    required this.email,
+    required this.name,
+    required this.group,
+  });
 
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
-      userid: json['userid'],
-      useremail: json['useremail'],
-      userpassword: json['userpassword'],
+      id: json['id'],
+      email: json['email'],
+      name: json['name'],
+      group: json['group'],
     );
   }
 
   Map<String, dynamic> toJson() => {
-    'userid' : userid,
-    'useremail': useremail,
-    'userpassword': userpassword,
-  };
+        'id': id,
+        'email': email,
+        'name': name,
+        'group': group,
+      };
 }

@@ -1,38 +1,42 @@
-import 'package:coffee_app/Pages/batch_results.dart';
-import 'package:coffee_app/Pages/capture_batch.dart';
+import 'package:coffee_app/Pages/Models/users.dart';
 import 'package:coffee_app/Pages/dashboard.dart';
-import 'package:coffee_app/Pages/home.dart';
-import 'package:coffee_app/Pages/scan_qrcode.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'Pages/auth_provider.dart';
 
 void main() {
-  runApp(
-    ChangeNotifierProvider(
+  runApp(ChangeNotifierProvider(
     create: (context) => AuthProvider(),
     child: const Home(),
-    )
-    );
+  ));
 }
 
 class Home extends StatelessWidget {
-  const Home({Key? key}) : super(key: key);
+  const Home({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      routes: {
-        '/': (context) => HomePage(), // Home screen route
-        '/dashboard': (context) => const Dashboard(), // Dashboard screen route
-        '/captureBatch':(context) => const CaptureBatch(),
-        '/scanQRcode': (context) => const QRCodeScannerScreen(),
-        '/batchResult': (context) => const BatchResult(qrCode: '',),
-        '/login':(context) =>  HomePage(),
-      },
-      initialRoute: '/',
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider<AuthService>(create: (_) => AuthService()),
+      ],
+      child: const MaterialApp(
+        debugShowCheckedModeBanner: true,
+        home: Dashboard(),
+      ),
     );
+  }
+}
+
+class AuthService extends ChangeNotifier {
+  User? user;
+
+  User? get getUser => user;
+
+  void setUser(User? currentUser) {
+    user = currentUser;
+    notifyListeners();
   }
 }
 

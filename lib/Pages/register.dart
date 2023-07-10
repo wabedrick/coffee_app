@@ -1,18 +1,39 @@
+import 'package:coffee_app/Constants/api.dart';
+import 'package:coffee_app/Pages/Models/users.dart';
+import 'package:coffee_app/Pages/dashboard.dart';
+import 'package:coffee_app/main.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class Register extends StatelessWidget {
+class Register extends StatefulWidget {
+  const Register({super.key});
+
+  @override
+  State<Register> createState() => _RegisterState();
+}
+
+class _RegisterState extends State<Register> {
   final TextEditingController _firstNameController = TextEditingController();
+
   final TextEditingController _lastNameController = TextEditingController();
-  final TextEditingController _countryController = TextEditingController();
+
+  final TextEditingController _locationController = TextEditingController();
+
   final TextEditingController _emailController = TextEditingController();
+
+  final TextEditingController _phoneNumberController = TextEditingController();
+
   final TextEditingController _passwordController = TextEditingController();
+
   final TextEditingController _confirmPasswordController =
       TextEditingController();
+
+  bool registering = false;
+
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  Register({super.key});
-
-  void _register(BuildContext context) {
+  Future<void> _register(BuildContext context) async {
     if (_formKey.currentState!.validate()) {
       if (_passwordController.text != _confirmPasswordController.text) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -27,19 +48,51 @@ class Register extends StatelessWidget {
         return;
       }
 
-      // Perform registration logic here, e.g., API call, database update, etc.
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Registration Successful',
-            textAlign: TextAlign.center,
-          ),
-          backgroundColor: Colors.green,
-        ),
-      );
+      setState(() {
+        registering = true;
+      });
 
-      // After successful registration, navigate to the dashboard screen
-      Navigator.pushReplacementNamed(context, '/dashboard');
+      final formData = {
+        'name': "${_firstNameController.text} ${_lastNameController.text}",
+        'location': _locationController.text,
+        'email': _emailController.text,
+        'phone': _phoneNumberController.text,
+        'password': _confirmPasswordController.text
+      };
+
+      await registerUser(formData).then((res) async {
+        setState(() {
+          registering = false;
+        });
+        if (res["status"] == "done") {
+          loginUser(
+                  email: _emailController.text,
+                  password: _passwordController.text)
+              .then((res) async {
+            if (res["message"] != "failed") {
+              User user = User.fromJson(res["data"]);
+              context.read<AuthService>().setUser(user);
+              SharedPreferences prefs = await SharedPreferences.getInstance();
+              await prefs.setString('userEmail', user.email);
+
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const Dashboard()),
+              );
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Invalid email or password')),
+              );
+            }
+          });
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+                backgroundColor: Colors.red,
+                content: Text('Error occurred during registration.')),
+          );
+        }
+      });
     }
   }
 
@@ -47,13 +100,12 @@ class Register extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        resizeToAvoidBottomInset: false,
         appBar: AppBar(
           title: const Text('Registration Form'),
           centerTitle: true,
           backgroundColor: Colors.brown[900],
         ),
-        body: Padding(
+        body: SingleChildScrollView(
           padding: const EdgeInsets.all(16.0),
           child: Form(
             key: _formKey,
@@ -88,9 +140,9 @@ class Register extends StatelessWidget {
                 ),
                 const SizedBox(height: 16.0),
                 TextFormField(
-                  controller: _countryController,
+                  controller: _locationController,
                   decoration: const InputDecoration(
-                    labelText: 'Country',
+                    labelText: 'Location',
                     labelStyle: TextStyle(color: Colors.brown),
                   ),
                   validator: (value) {
@@ -119,6 +171,21 @@ class Register extends StatelessWidget {
                 ),
                 const SizedBox(height: 16.0),
                 TextFormField(
+                  controller: _phoneNumberController,
+                  decoration: const InputDecoration(
+                    labelText: 'Phone number',
+                    labelStyle: TextStyle(color: Colors.brown),
+                  ),
+                  keyboardType: TextInputType.number,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your phone.';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16.0),
+                TextFormField(
                   controller: _passwordController,
                   decoration: const InputDecoration(
                     labelText: 'Password',
@@ -132,16 +199,17 @@ class Register extends StatelessWidget {
                     if (value.length < 8) {
                       return 'Password must be at least 8 characters long.';
                     }
-                    if (!value.contains(RegExp(r'[A-Z]'))) {
-                      return 'Password must contain at least one uppercase letter.';
-                    }
-                    if (!value.contains(RegExp(r'[a-z]'))) {
-                      return 'Password must contain at least one lowercase letter.';
-                    }
-                    if (!value.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'))) {
-                      return 'Password must contain at least one special character.';
-                    }
                     return null;
+                    // if (!value.contains(RegExp(r'[A-Z]'))) {
+                    //   return 'Password must contain at least one uppercase letter.';
+                    // }
+                    // if (!value.contains(RegExp(r'[a-z]'))) {
+                    //   return 'Password must contain at least one lowercase letter.';
+                    // }
+                    // if (!value.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'))) {
+                    //   return 'Password must contain at least one special character.';
+                    // }
+                    // return null;
                   },
                 ),
                 const SizedBox(height: 16.0),
@@ -163,22 +231,35 @@ class Register extends StatelessWidget {
                 Row(
                   children: [
                     Expanded(
-                      child: ElevatedButton(
-                        onPressed: () => _register(context),
-                        style: ButtonStyle(
-                          backgroundColor:
-                              MaterialStateProperty.all<Color>(Colors.brown),
-                          foregroundColor:
-                              MaterialStateProperty.all<Color>(Colors.white),
-                          padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
-                            const EdgeInsets.symmetric(
-                              vertical: 16.0,
-                              horizontal: 14.0,
+                      child: (!registering)
+                          ? ElevatedButton(
+                              onPressed: () => _register(context),
+                              style: ButtonStyle(
+                                backgroundColor:
+                                    MaterialStateProperty.all<Color>(
+                                        Colors.brown),
+                                foregroundColor:
+                                    MaterialStateProperty.all<Color>(
+                                        Colors.white),
+                                padding: MaterialStateProperty.all<
+                                    EdgeInsetsGeometry>(
+                                  const EdgeInsets.symmetric(
+                                    vertical: 16.0,
+                                    horizontal: 14.0,
+                                  ),
+                                ),
+                              ),
+                              child: const Text('Register'),
+                            )
+                          : Container(
+                              width: 25,
+                              height: 25,
+                              margin: const EdgeInsets.symmetric(vertical: 10),
+                              alignment: Alignment.center,
+                              child: CircularProgressIndicator(
+                                color: Colors.brown[600],
+                              ),
                             ),
-                          ),
-                        ),
-                        child: const Text('Register'),
-                      ),
                     ),
                   ],
                 ),
@@ -190,4 +271,3 @@ class Register extends StatelessWidget {
     );
   }
 }
-
